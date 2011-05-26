@@ -28,15 +28,15 @@ if [ $# -eq 0 ]; then
   exit
 fi
 
-#if [ `ps -ef | grep -v "grep" | grep -c "adb"` -lt 1 ]; then
-#  echo "plese run adb"
-#  exit
-#else
-#  if [ `$ADB devices | wc -l ` -lt 3 ]; then
-#    echo "Couldn't find device"
-#    exit
-#  fi
-#fi
+if [ `ps -ef | grep -v "grep" | grep -c "adb"` -lt 1 ]; then
+  echo "plese run adb"
+  exit
+else
+  if [ `$ADB devices | wc -l ` -lt 3 ]; then
+    echo "Couldn't find device"
+    exit
+  fi
+fi
 
 if [ -f $EXTCOMMANDS ]; then
   rm $EXTCOMMANDS
@@ -138,7 +138,6 @@ if [ $LIST -eq 1 ]; then
   exit
 fi
 
-exit
 $ADB push $EXTCOMMANDS /cache/recovery/ 2> /dev/null
 
 echo -e "\n$BOLD$RED"
