@@ -3,7 +3,7 @@ README for crackflasher
 
 Summary
 -------------
-Crackflasher is a bash script for flashing roms to android devies running ClockworkMod.
+Crackflasher is a bash script for flashing roms to android devices running ClockworkMod.
 
 My Working Environment
 -------------
@@ -22,7 +22,7 @@ Usage: ./crackflasher.bash -b -w [num] update.zip update2.zip
 -b - makes backup in /sdcard/clockworkmod/backup/ named date and is optional
 -l - list backups in /sdcard/clockworkmod/backup/
 -r - recovery from backup. If backup is on local machine it will push it to /sdcard/clockworkmod/backup/
-list in order the update.zip files you want to instal
+list in order the update.zip files you want to install
 
 How it works
 -------------

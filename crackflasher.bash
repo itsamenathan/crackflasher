@@ -3,7 +3,7 @@
 ###########################################################################
 #                 CONFIG
 # Location of adb
-ADB="/home/nwarner/Desktop/android-sdk-linux_x86/platform-tools/adb"
+ADB="~/Desktop/android-sdk-linux_x86/platform-tools/adb"
 ###########################################################################
 
 # flags
@@ -19,7 +19,7 @@ RED="\033[31m"
 GREEN="\033[32m"
 
 if [ $# -eq 0 ]; then
-  echo "Usage: ./crack_flasher -b -w [num] update.zip update2.zip"
+  echo "Usage: ./crackflasher -b -w [num] update.zip update2.zip"
   echo "-w - wipe Dalvik /cache /data it is optional [num] specifies how many wipes to do"
   echo "-b - makes backup in /sdcard/clockworkmod/backup/ named date and is optional"
   echo "-l - list backups in /sdcard/clockworkmod/backup/"
@@ -29,7 +29,7 @@ if [ $# -eq 0 ]; then
 fi
 
 if [ `ps -ef | grep -v "grep" | grep -c "adb"` -lt 1 ]; then
-  echo "plese run adb"
+  echo "ADB server isn't running"
   exit
 else
   if [ `$ADB devices | wc -l ` -lt 3 ]; then
