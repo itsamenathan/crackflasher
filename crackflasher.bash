@@ -31,11 +31,11 @@ fi
 if [ `ps -ef | grep -v "grep" | grep -c "adb fork-server"` -lt 1 ]; then
   echo "ADB server isn't running"
   exit
-else
-  if [ `$ADB devices | wc -l ` -lt 3 ]; then
-    echo "Couldn't find device"
-    exit
-  fi
+fi
+
+if [ `$ADB devices | wc -l ` -lt 3 ]; then
+  echo "Couldn't find device"
+  exit
 fi
 
 if [ -f $EXTCOMMANDS ]; then
