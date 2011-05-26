@@ -25,17 +25,17 @@ if [ $# -eq 0 ]; then
   echo "-l - list backups in /sdcard/clockworkmod/backup/"
   echo "-r - recovery from backup. If backup is on local machine it will push it to /sdcard/clockworkmod/backup/"
   echo "list in order the update.zip files you want to install"
-  exit
+  exit 1
 fi
 
 if [ `ps -ef | grep -v "grep" | grep -c "adb fork-server"` -lt 1 ]; then
   echo "ADB server isn't running"
-  exit
+  exit 1
 fi
 
 if [ `$ADB devices | wc -l ` -lt 3 ]; then
   echo "Couldn't find device"
-  exit
+  exit 1
 fi
 
 if [ -f $EXTCOMMANDS ]; then
@@ -52,7 +52,7 @@ while getopts ":w:br:l" opt; do
         WIPE=$OPTARG
       else
         echo "-w needs a number after it"
-        exit
+        exit 1
       fi
       ;;
     r)
