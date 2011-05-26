@@ -3,7 +3,7 @@
 ###########################################################################
 #                 CONFIG
 # Location of adb
-ADB="~/Desktop/android-sdk-linux_x86/platform-tools/adb"
+ADB="/home/nwarner/Desktop/android-sdk-linux_x86/platform-tools/adb"
 ###########################################################################
 
 # flags
@@ -28,7 +28,7 @@ if [ $# -eq 0 ]; then
   exit
 fi
 
-if [ `ps -ef | grep -v "grep" | grep -c "adb"` -lt 1 ]; then
+if [ `ps -ef | grep -v "grep" | grep -c "adb fork-server"` -lt 1 ]; then
   echo "ADB server isn't running"
   exit
 else
@@ -91,7 +91,7 @@ for ((i=0; i < $WIPE; i++)) {
 
 if [ $RECOVER != 0 ]; then
     if [ $(echo "$RECOVER" | grep -c "^/sdcard") != 0 ]; then
-      echo "${BOLD}${GREEN}RESTORE${NORM} - $RECOVER"
+      echo -e "${BOLD}${GREEN}RESTORE${NORM} - $RECOVER"
       echo "restore_rom(\"$RECOVER\");" >> $EXTCOMMANDS
     else
       filename=`basename $RECOVER`
