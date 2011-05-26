@@ -28,15 +28,15 @@ if [ $# -eq 0 ]; then
   exit
 fi
 
-if [ `ps -ef | grep -v "grep" | grep -c "adb"` -lt 1 ]; then
-  echo "plese run adb"
-  exit
-else
-  if [ `$ADB devices | wc -l ` -lt 3 ]; then
-    echo "Couldn't find device"
-    exit
-  fi
-fi
+#if [ `ps -ef | grep -v "grep" | grep -c "adb"` -lt 1 ]; then
+#  echo "plese run adb"
+#  exit
+#else
+#  if [ `$ADB devices | wc -l ` -lt 3 ]; then
+#    echo "Couldn't find device"
+#    exit
+#  fi
+#fi
 
 if [ -f $EXTCOMMANDS ]; then
   rm $EXTCOMMANDS
@@ -113,10 +113,21 @@ else
   for ((i=$OPTIND-1; i < $#; i++)) {
     fullpath=${args[$i]}
     filename=`basename ${args[$i]}`
+    if [ `$ADB shell stat /sdcard/$filename | grep -c "can't stat"` -eq 0 ]; then
+      read -n1 -p "Update already exists on sdcard, overwrite? (y/N) [N] "
+      if [[ $REPLY = [yY] ]]; then
+        echo
+        echo "Pushing $filename to /sdcard"
+        $ADB shell rm -r /sdcard/$filename
+        $ADB push $fullpath /sdcard/ 2> /dev/null
+      fi
+    else
+        echo "Pushing $filename to /sdcard"
+        $ADB push $fullpath /sdcard/ 2> /dev/null
+    fi
+    echo
     echo "install_zip(\"/sdcard/$filename\");" >> $EXTCOMMANDS
-    echo "Pushing $filename to /sdcard"
-    $ADB push $fullpath /sdcard/ 2> /dev/null
-    echo "Going to be installing /sdcard/$filename"
+    echo -e "${BOLD}${GREEN}Install${NORM} /sdcard/$filename"
   }
 fi
 
@@ -127,7 +138,7 @@ if [ $LIST -eq 1 ]; then
   exit
 fi
 
-
+exit
 $ADB push $EXTCOMMANDS /cache/recovery/ 2> /dev/null
 
 echo -e "\n$BOLD$RED"
