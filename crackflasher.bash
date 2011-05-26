@@ -36,6 +36,9 @@ else
     echo "Couldn't find device"
     exit
   fi
+fi
+
+if [ -f $EXTCOMMANDS ]; then
   rm $EXTCOMMANDS
 fi
 
