@@ -3,7 +3,7 @@
 ###########################################################################
 #                 CONFIG
 # Location of adb
-ADB="/home/jimshoe/android-sdk-linux_86/platform-tools/adb"
+ADB="/home/nwarner/android-sdk-linux_x86/platform-tools/adb"
 ###########################################################################
 
 # flags
@@ -139,11 +139,15 @@ if [ $BACKUP -eq 1 ]; then
   echo -e "${BOLD}${GREEN}BACKUP${NORM} /sdcard/clockworkmod/backup/$backup_file";
 fi
 
+# used to format, sometimes its good to format more than once.
 for ((i=0; i < $WIPE; i++)) {
   echo "format(\"/cache\");" >> $EXTCOMMANDS
   echo "format(\"/data\");" >> $EXTCOMMANDS
   echo "format(\"/sd-ext\");" >> $EXTCOMMANDS
   echo "format(\"/sdcard/.android_secure\");" >> $EXTCOMMANDS
+  # CM7 doesn't flash system, this is how it keeps some apps.
+  # Good to use to make sure your device is clean.
+  # Leaves device without a system, so be careful.
   if [ $WIPE_SYSTEM -eq 1 ]; then
     echo "format(\"/system\");" >> $EXTCOMMANDS
     echo -e "${BOLD}${RED}FORMATTING${NORM} Dalvik, /cache, /data, /sd-ext"
@@ -155,12 +159,15 @@ for ((i=0; i < $WIPE; i++)) {
 
 
 if [ $RECOVER != 0 ]; then
+    # for recovery of backup
     if [ $(echo "$RECOVER" | grep -c "^/sdcard") != 0 ]; then
       echo -e "${BOLD}${GREEN}RESTORE${NORM} - $RECOVER"
       echo "restore_rom(\"$RECOVER\");" >> $EXTCOMMANDS
     else
       filename=`basename $RECOVER`
-      if [ `$ADB shell stat /sdcard/clockworkmod/backup/$filename | grep -c "can't stat"` -eq 0 ]; then
+      # check to see if backup is already there, if so ask to overwrite
+      # Using ls because some roms don't have all of busybox
+      if [ `$ADB shell ls /sdcard/clockworkmod/backup/$filename | grep -c -v "No such file or directory"` -gt 0 ]; then
         echo "Pushing $filename to sdcard" 
         read -n1 -p "$filename already exists on sdcard, overwrite? (y/N) [N] "
         if [[ $REPLY = [yY] ]]; then
@@ -170,15 +177,18 @@ if [ $RECOVER != 0 ]; then
           $ADB push $RECOVER /sdcard/clockworkmod/backup/$filename 2> /dev/null
         fi
       fi
+      echo
       echo "restore_rom(\"/sdcard/clockworkmod/backup/$filename\");" >> $EXTCOMMANDS
       echo -e "${BOLD}${GREEN}RESTORE${NORM} - $RECOVER"
     fi
 else
+  # This is where we pare though the .zip files to install
   args=("$@")
   for ((i=$OPTIND-1; i < $#; i++)) {
     fullpath=${args[$i]}
     filename=`basename ${args[$i]}`
-    if [ `$ADB shell stat /sdcard/$filename | grep -c "can't stat"` -eq 0 ]; then
+    # check to see if file is already there, if so ask to overwrite.
+    if [ `$ADB shell ls /sdcard/$filename | grep -c -v "No such file or directory"` -eq 1 ]; then
       echo "Pushing $filename to /sdcard"
       read -n1 -p "$filename already exists on sdcard, overwrite? (y/N) [N] "
       if [[ $REPLY = [yY] ]]; then
@@ -196,13 +206,16 @@ else
   }
 fi
 
+# flag to list all the backups in /sdcard/clockworkmod/backup/
+# Using ls because some roms don't have all of busybox
 if [ $LIST -eq 1 ]; then
   echo "List of backups on sdcard"
   echo ""
-  $ADB shell find /sdcard/clockworkmod/backup -type d | grep "/sdcard/clockworkmod/backup/"
+  $ADB shell ls -l /sdcard/clockworkmod/backup/ | grep "^d" | awk '{ print $6 }'
   exit
 fi
 
+# flag to boot into bootloader after clockwork
 if [ $BOOTLOADER -eq 1 ]; then
   echo -e "${BOLD}${RED}REBOOT BOOTLOADER${NORM} Going to reboot into bootloader when complete"
   echo "run_program(\"/sbin/reboot\",\"bootloader\");" >> $EXTCOMMANDS
@@ -213,13 +226,14 @@ read -n1 -p "REBOOT & INSTALL? (y/N) [N] "
 echo -e "\n$NORM"
 echo
 if [[ $REPLY = [yY] ]]; then
+  # even if adb is running as root, this will reboot it, thats why there is a wait.
   if [ `$ADB root | grep -c "already running as root"` -ne 1 ]; then
     sleep 5
   fi
   $ADB push $EXTCOMMANDS /cache/recovery/ 2> /dev/null
   $ADB reboot recovery
 else
-  echo "Aborting!."
+  echo "Aborting!"
   exit 1;
 fi
 
