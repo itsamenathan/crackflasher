@@ -1,6 +1,12 @@
 README for crackflasher
 =============
 
+TODO
+-------------
+* Update to work with TWR and CWM-based recovery
+** http://www.teamw.in/OpenRecoveryScript
+
+
 Summary
 -------------
 Crackflasher is a bash script for flashing roms to android devices running ClockworkMod.
